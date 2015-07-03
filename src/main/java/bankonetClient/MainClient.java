@@ -40,6 +40,7 @@ public class MainClient
 		System.out.println("0.Arrêter le programme");
 		System.out.println("1.Consulter les soldes des comptes");
 		System.out.println("2.Effectuer un dépôt");
+		System.out.println("3.Effectuer un retrait");
 		System.out.println("Veuillez choisir une action.");
 		
 		Integer action = sysInInt();
@@ -54,21 +55,50 @@ public class MainClient
 			case 2:
 				effectuerDepot(login);
 				break;
+			case 3:
+				effectuerRetrait(login);
+				break;
 			default:
 				break;
 			}
 		
 		}
 	
+	private static void effectuerRetrait(String login)
+		{
+		System.out.println(dbAccess.afficherComptesCourants(login));
+		System.out.println("compte à débiter(utiliser le libelle):");
+		String libelle = sysInString();
+		System.out.println("montant à débiter:");
+		float montant = sysInFloat();
+		if(montant!=0)
+			{
+			if(!dbAccess.debiterCompteCourantClient(login,libelle,montant))
+				{
+				System.out.println("Retrait impossible!");
+				effectuerRetrait(login);
+				}
+			else
+				{
+				System.out.println(dbAccess.afficherComptesCourants(login));
+				logged(login);
+				}
+			}
+		else
+			{
+			logged(login);
+			}
+		}
+
 	private static void effectuerDepot(String login)
 		{
 		System.out.println(dbAccess.afficherComptesCourants(login));
-		System.out.println("compte à créditer(utiliser l'id):");
-		String idCompte = sysInString();
+		System.out.println("compte à créditer(utiliser le libelle):");
+		String libelle = sysInString();
 		System.out.println("montant à déposer:");
 		float montant = sysInFloat();
 		
-		dbAccess.setSoldeCompteCourantClient(login,idCompte,montant);
+		dbAccess.crediterCompteCourantClient(login,libelle,montant);
 		logged(login);
 		}
 

@@ -170,7 +170,7 @@ public class MongoDbAccess
 	public String afficherComptesCourants(String login)
 		{
 		String res= new String();
-		res+= "id | libelle | solde\n";
+		res+= "libelle | solde\n";
 
 		Logger.getLogger("").setLevel(Level.SEVERE);
 
@@ -183,15 +183,12 @@ public class MongoDbAccess
 
 			for(Document document: collection.find(query))
 				{
-				System.out.println(document);
 				List<Document> comptesCourants= (ArrayList<Document>)document.get("comptesCourants");
 				for(Iterator<Document> iterator= comptesCourants.iterator() ; iterator
 						.hasNext() ;)
 					{
 					Document compteCourant= (Document)iterator.next();
-					System.out.println(compteCourant);
-					res += document.get("_id").toString() + " | " +
-							compteCourant.get("libelle").toString() + " | " +
+					res += compteCourant.get("libelle").toString() + " | " +
 							compteCourant.get("solde").toString() + "\n";
 					}
 				}
@@ -205,8 +202,10 @@ public class MongoDbAccess
 		return res;
 		}
 
-	public void setSoldeCompteCourantClient(	String login,
-															String idCompte,
+	
+	
+	public void crediterCompteCourantClient(	String login,
+															String libelle,
 															float montant)
 		{
 		Logger.getLogger("").setLevel(Level.SEVERE);
@@ -226,7 +225,7 @@ public class MongoDbAccess
 						.hasNext() ;)
 					{
 					Document compteCourant= (Document)iterator.next();
-					if(document.get("_id").toString().equals(idCompte))
+					if(compteCourant.get("libelle").toString().equals(libelle))
 						{
 						comptesCourantsUpdate.add(new Document()
 						.append("libelle",compteCourant.get("libelle"))
@@ -247,5 +246,43 @@ public class MongoDbAccess
 		finally
 			{
 			}
+		}
+
+	public boolean debiterCompteCourantClient(String login,
+														String libelle,
+														float montant)
+		{
+		Logger.getLogger("").setLevel(Level.SEVERE);
+
+		try(MongoClient mongoClient= new MongoClient())
+			{
+			MongoDatabase db= mongoClient.getDatabase("bankonetdb");
+			MongoCollection<Document> collection= db.getCollection("clients");
+
+			BasicDBObject query= new BasicDBObject().append("login", login);
+
+			for(Document document: collection.find(query))
+				{
+				List<Document> comptesCourants= (ArrayList<Document>)document.get("comptesCourants");
+				for(Iterator<Document> iterator= comptesCourants.iterator() ; iterator
+						.hasNext() ;)
+					{
+					Document compteCourant= (Document)iterator.next();
+					if(compteCourant.get("libelle").toString().equals(libelle))
+						{
+						if((new Float(compteCourant.get("solde").toString())-montant)<0)
+							{
+							return false;
+							}
+						}
+					}
+								}
+			crediterCompteCourantClient(login, libelle, -montant);//debiter de X correspond à créditer de -X
+			mongoClient.close();
+			}
+		finally
+			{
+			}
+		return (true);
 		}
 	}
