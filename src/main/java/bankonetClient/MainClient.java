@@ -12,6 +12,13 @@ public class MainClient
 	public static void main(String[] args)
 		{
 		login();
+		try
+			{
+			clavier.close();
+			}
+		catch(IllegalStateException e)
+			{
+			}
 		System.exit(0);//trouver autre chose, ça a pas l'air net...
 		}
 
@@ -111,7 +118,6 @@ public class MainClient
 	public static void terminerProgramme()
 		{
 		System.out.println(" Arrêt de l’application");
-		clavier.close();
 		}
 	
 	public static String sysInString()

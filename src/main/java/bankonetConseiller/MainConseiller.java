@@ -13,6 +13,13 @@ public class MainConseiller
 	public static void main(String[] args)
 		{
 		menuPrincipal();
+		try
+			{
+			clavier.close();
+			}
+		catch(IllegalStateException e)
+			{
+			}
 		System.exit(0);//trouver autre chose, ça a pas l'air net...
 		}
 
@@ -22,6 +29,7 @@ public class MainConseiller
 		System.out.println("0.Arrêter le programme");
 		System.out.println("1.Ouvrir	un compte");
 		System.out.println("2.Lister tous les clients");
+		System.out.println("3.Ajouter un compte courant");
 		System.out.println("Veuillez choisir une action.");
 
 		
@@ -38,11 +46,22 @@ public class MainConseiller
 			case 2:
 				listerTousLesClients();
 				break;
+			case 3:
+				ajouterUnCompteCourant();
 			default:
 				System.out.println("Choix invalide!");
 				menuPrincipal();
 				break;
 			}
+		}
+
+	private static void ajouterUnCompteCourant()
+		{
+		System.out.println(dbAccess.getInfosClients());
+		System.out.println("client(utiliser l'id):");
+		String id = sysInString();
+		
+		dbAccess.ajouterCompteCourant(id);
 		}
 
 	private static void listerTousLesClients()
@@ -53,8 +72,7 @@ public class MainConseiller
 
 	public static void terminerProgramme()
 		{
-		System.out.println(" Arrêt de l’application");
-		clavier.close();
+		System.out.println("Arrêt de l’application");
 		}
 	
 	public static void ouvrirCompte()

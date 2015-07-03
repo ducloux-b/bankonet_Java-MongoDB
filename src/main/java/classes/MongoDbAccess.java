@@ -7,6 +7,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.bson.Document;
+import org.bson.types.ObjectId;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.MongoClient;
@@ -284,5 +285,40 @@ public class MongoDbAccess
 			{
 			}
 		return (true);
+		}
+
+	public void ajouterCompteCourant(String id)
+		{
+		Logger.getLogger("").setLevel(Level.SEVERE);
+
+		try(MongoClient mongoClient= new MongoClient())
+			{
+			MongoDatabase db= mongoClient.getDatabase("bankonetdb");
+			MongoCollection<Document> collection= db.getCollection("clients");
+
+			BasicDBObject query= new BasicDBObject().append("_id", new ObjectId(id));
+
+			for(Document document: collection.find(query))
+				{
+				int nbComptesCourants= ((ArrayList)document.get("comptesCourants")).size();
+				List<Document> comptesCourants= (ArrayList<Document>)document.get("comptesCourants");
+				List<Document> comptesCourantsUpdate = new ArrayList<Document>();
+				for(Iterator<Document> iterator= comptesCourants.iterator() ; iterator
+						.hasNext() ;)
+					{
+					Document compteCourant= (Document)iterator.next();
+					comptesCourantsUpdate.add(compteCourant);
+					//idéallement, il faudrait convertir le client en objet pour le re-convertir en donnée de la base
+					}
+				
+				comptesCourantsUpdate.add(new Document().append("libelle",document.get("nom").toString()+"_"+document.get("prenom").toString()+"_COURANT_"+(nbComptesCourants+1)).append("solde", 0));
+				collection.updateOne(query, new Document("$set",new Document().append("comptesCourants", comptesCourantsUpdate)));
+				}
+
+			mongoClient.close();
+			}
+		finally
+			{
+			}
 		}
 	}
