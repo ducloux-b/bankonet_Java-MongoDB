@@ -105,9 +105,8 @@ public class MongoDbAccess
 			MongoDatabase db= mongoClient.getDatabase("bankonetdb");
 			MongoCollection<Document> collection= db.getCollection("clients");
 
-			BasicDBObject query= new BasicDBObject()
-				.append("login", login)
-				.append("password", password);
+			BasicDBObject query= new BasicDBObject().append("login", login)
+					.append("password", password);
 
 			for(Document document: collection.find(query))
 				{
@@ -126,9 +125,9 @@ public class MongoDbAccess
 
 	public String afficherSoldes(String login)
 		{
-		String res = new String();
-		res += "libelle | solde\n";
-		
+		String res= new String();
+		res+= "libelle | solde\n";
+
 		Logger.getLogger("").setLevel(Level.SEVERE);
 
 		try(MongoClient mongoClient= new MongoClient())
@@ -136,25 +135,26 @@ public class MongoDbAccess
 			MongoDatabase db= mongoClient.getDatabase("bankonetdb");
 			MongoCollection<Document> collection= db.getCollection("clients");
 
-			BasicDBObject query= new BasicDBObject()
-				.append("login", login);
+			BasicDBObject query= new BasicDBObject().append("login", login);
 
 			for(Document document: collection.find(query))
 				{
-				List comptesCourants = (ArrayList)document.get("comptesCourants");
+				List comptesCourants= (ArrayList)document.get("comptesCourants");
 				for(Iterator iterator= comptesCourants.iterator() ; iterator
 						.hasNext() ;)
 					{
 					Document compteCourant= (Document)iterator.next();
-					res += compteCourant.get("libelle").toString()+" | "+compteCourant.get("solde").toString()+"\n";
+					res+= compteCourant.get("libelle").toString() + " | " +
+							compteCourant.get("solde").toString() + "\n";
 					}
-				
-				List comptesEpargnes = (ArrayList)document.get("comptesEpargnes");
+
+				List comptesEpargnes= (ArrayList)document.get("comptesEpargnes");
 				for(Iterator iterator= comptesEpargnes.iterator() ; iterator
 						.hasNext() ;)
 					{
 					Document compteEpargne= (Document)iterator.next();
-					res += compteEpargne.get("libelle").toString()+" | "+compteEpargne.get("solde").toString()+"\n";
+					res+= compteEpargne.get("libelle").toString() + " | " +
+							compteEpargne.get("solde").toString() + "\n";
 					}
 				}
 
@@ -163,7 +163,89 @@ public class MongoDbAccess
 		finally
 			{
 			}
-		
+
 		return res;
+		}
+
+	public String afficherComptesCourants(String login)
+		{
+		String res= new String();
+		res+= "id | libelle | solde\n";
+
+		Logger.getLogger("").setLevel(Level.SEVERE);
+
+		try(MongoClient mongoClient= new MongoClient())
+			{
+			MongoDatabase db= mongoClient.getDatabase("bankonetdb");
+			MongoCollection<Document> collection= db.getCollection("clients");
+
+			BasicDBObject query= new BasicDBObject().append("login", login);
+
+			for(Document document: collection.find(query))
+				{
+				System.out.println(document);
+				List<Document> comptesCourants= (ArrayList<Document>)document.get("comptesCourants");
+				for(Iterator<Document> iterator= comptesCourants.iterator() ; iterator
+						.hasNext() ;)
+					{
+					Document compteCourant= (Document)iterator.next();
+					System.out.println(compteCourant);
+					res += document.get("_id").toString() + " | " +
+							compteCourant.get("libelle").toString() + " | " +
+							compteCourant.get("solde").toString() + "\n";
+					}
+				}
+
+			mongoClient.close();
+			}
+		finally
+			{
+			}
+
+		return res;
+		}
+
+	public void setSoldeCompteCourantClient(	String login,
+															String idCompte,
+															float montant)
+		{
+		Logger.getLogger("").setLevel(Level.SEVERE);
+
+		try(MongoClient mongoClient= new MongoClient())
+			{
+			MongoDatabase db= mongoClient.getDatabase("bankonetdb");
+			MongoCollection<Document> collection= db.getCollection("clients");
+
+			BasicDBObject query= new BasicDBObject().append("login", login);
+
+			for(Document document: collection.find(query))
+				{
+				List<Document> comptesCourants= (ArrayList<Document>)document.get("comptesCourants");
+				List<Document> comptesCourantsUpdate = new ArrayList<Document>();
+				for(Iterator<Document> iterator= comptesCourants.iterator() ; iterator
+						.hasNext() ;)
+					{
+					Document compteCourant= (Document)iterator.next();
+					if(document.get("_id").toString().equals(idCompte))
+						{
+						comptesCourantsUpdate.add(new Document()
+						.append("libelle",compteCourant.get("libelle"))
+						.append("solde", ((new Float(compteCourant.get("solde").toString()))+montant))
+						);
+						}
+					else
+						{
+						comptesCourantsUpdate.add(compteCourant);
+						}
+					}
+				
+				collection.updateOne(query, new Document("$set",new Document().append("comptesCourants", comptesCourantsUpdate)));
+				}
+
+			mongoClient.close();
+			}
+		finally
+			{
+			}
 		}
 	}

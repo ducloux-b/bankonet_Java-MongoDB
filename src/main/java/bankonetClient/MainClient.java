@@ -39,6 +39,7 @@ public class MainClient
 		System.out.println("*****APPLICATION CONSEILLER BANCAIRE******");
 		System.out.println("0.Arrêter le programme");
 		System.out.println("1.Consulter les soldes des comptes");
+		System.out.println("2.Effectuer un dépôt");
 		System.out.println("Veuillez choisir une action.");
 		
 		Integer action = sysInInt();
@@ -50,12 +51,27 @@ public class MainClient
 			case 1:
 				afficherSoldeDesComptes(login);
 				break;
+			case 2:
+				effectuerDepot(login);
+				break;
 			default:
 				break;
 			}
 		
 		}
 	
+	private static void effectuerDepot(String login)
+		{
+		System.out.println(dbAccess.afficherComptesCourants(login));
+		System.out.println("compte à créditer(utiliser l'id):");
+		String idCompte = sysInString();
+		System.out.println("montant à déposer:");
+		float montant = sysInFloat();
+		
+		dbAccess.setSoldeCompteCourantClient(login,idCompte,montant);
+		logged(login);
+		}
+
 	private static void afficherSoldeDesComptes(String login)
 		{
 		System.out.println(dbAccess.afficherSoldes(login));
@@ -71,6 +87,11 @@ public class MainClient
 	public static String sysInString()
 		{
 		return clavier.next();
+		}
+	
+	public static float sysInFloat()
+		{
+		return clavier.nextFloat();
 		}
 	
 	public static int sysInInt()
