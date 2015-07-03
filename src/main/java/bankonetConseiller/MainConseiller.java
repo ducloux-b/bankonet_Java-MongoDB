@@ -1,5 +1,6 @@
 package bankonetConseiller;
 
+import java.util.List;
 import java.util.Scanner;
 
 import classes.Client;
@@ -8,6 +9,7 @@ import classes.MongoDbAccess;
 public class MainConseiller
 	{
 	static Scanner clavier= new Scanner(System.in);
+	static MongoDbAccess dbAccess = new MongoDbAccess();
 	
 	public static void main(String[] args)
 		{
@@ -19,6 +21,7 @@ public class MainConseiller
 		System.out.println("*****APPLICATION CONSEILLER BANCAIRE******");
 		System.out.println("0.Arrêter le programme");
 		System.out.println("1.Ouvrir	un compte");
+		System.out.println("2.Lister tous les clients");
 		System.out.println("Veuillez choisir une action.");
 
 		
@@ -32,11 +35,20 @@ public class MainConseiller
 			case 1:
 				ouvrirCompte();
 				break;
+			case 2:
+				listerTousLesClients();
+				break;
 			default:
 				System.out.println("Choix invalide!");
 				menuPrincipal();
 				break;
 			}
+		}
+
+	private static void listerTousLesClients()
+		{
+		System.out.println(dbAccess.getInfosClients());
+		menuPrincipal();
 		}
 
 	public static void terminerProgramme()
@@ -55,7 +67,6 @@ public class MainConseiller
 		String login = sysInString();
 		String password = "secret";
 		
-		MongoDbAccess dbAccess = new MongoDbAccess();
 		Client client = new Client(nomClient, prenomClient, login, password);
 		client.ajouterCompteCourant(0);
 		dbAccess.setClient(client);

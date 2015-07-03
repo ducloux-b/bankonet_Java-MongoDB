@@ -58,6 +58,14 @@ public class Client
 		{
 		return password;
 		}
+
+//	public String infoClient()
+//		{
+//		
+//		return (
+//				this.get
+//				);
+//		}
 	
 	
 	}
