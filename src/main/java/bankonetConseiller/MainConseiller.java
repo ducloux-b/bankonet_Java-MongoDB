@@ -1,6 +1,5 @@
 package bankonetConseiller;
 
-import java.util.List;
 import java.util.Scanner;
 
 import classes.Client;
@@ -14,6 +13,7 @@ public class MainConseiller
 	public static void main(String[] args)
 		{
 		menuPrincipal();
+		System.exit(0);//trouver autre chose, ça a pas l'air net...
 		}
 
 	public static void menuPrincipal()
@@ -26,7 +26,7 @@ public class MainConseiller
 
 		
 		Integer choix= new Integer(-1);
-		choix= clavier.nextInt();
+		choix= sysInInt();
 		switch(choix)
 			{
 			case 0:
@@ -76,9 +76,11 @@ public class MainConseiller
 	
 	public static String sysInString()
 		{
-		String chaine= new String();
-		chaine= clavier.next();
-		return chaine;
+		return clavier.next();
+		}
+	public static int sysInInt()
+		{
+		return clavier.nextInt();
 		}
 	
 	}

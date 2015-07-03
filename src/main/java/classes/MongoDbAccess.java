@@ -54,43 +54,72 @@ public class MongoDbAccess
 			}
 		finally
 			{
-
 			}
 		}
 
 	public String getInfosClients()
 		{
 		Logger.getLogger("").setLevel(Level.SEVERE);
-		
+
 		String res= new String();
-		res += "id | login | nom | prenom | nbComptesCourants | nbComptesEpargnes\n";
+		res+= "id | login | nom | prenom | nbComptesCourants | nbComptesEpargnes\n";
 		try(MongoClient mongoClient= new MongoClient())
 			{
 			MongoDatabase db= mongoClient.getDatabase("bankonetdb");
 			MongoCollection<Document> collection= db.getCollection("clients");
 
-			BasicDBObject query = new BasicDBObject();
-			
+			BasicDBObject query= new BasicDBObject();
+
 			for(Document document: collection.find(query))
 				{
-				String id = document.get("_id").toString();
-				String login = document.get("login").toString();
-				String nom = document.get("nom").toString();
-				String prenom = document.get("prenom").toString();
-				int nbComptesCourants = ((ArrayList)document.get("comptesCourants")).size();
-				int nbComptesEpargnes = ((ArrayList)document.get("comptesEpargnes")).size();
-				
-				res += id+" | "+login+" | "+nom+" | "+prenom+" | "+nbComptesCourants+" | "+nbComptesEpargnes+"\n";
-				
+				String id= document.get("_id").toString();
+				String login= document.get("login").toString();
+				String nom= document.get("nom").toString();
+				String prenom= document.get("prenom").toString();
+				int nbComptesCourants= ((ArrayList)document.get("comptesCourants"))
+						.size();
+				int nbComptesEpargnes= ((ArrayList)document.get("comptesEpargnes"))
+						.size();
+
+				res+= id + " | " + login + " | " + nom + " | " + prenom + " | " +
+						nbComptesCourants + " | " + nbComptesEpargnes + "\n";
+
 				}
-			
+
 			mongoClient.close();
 			}
 		finally
 			{
-
 			}
 
 		return res;
+		}
+
+	public boolean loginAndPasswordAccepted(String login, String password)
+		{
+		Logger.getLogger("").setLevel(Level.SEVERE);
+
+		try(MongoClient mongoClient= new MongoClient())
+			{
+			MongoDatabase db= mongoClient.getDatabase("bankonetdb");
+			MongoCollection<Document> collection= db.getCollection("clients");
+
+			BasicDBObject query= new BasicDBObject()
+				.append("login", login)
+				.append("password", password);
+
+			for(Document document: collection.find(query))
+				{
+				mongoClient.close();
+				return true;
+				}
+
+			mongoClient.close();
+			}
+		finally
+			{
+			}
+
+		return false;
 		}
 	}
