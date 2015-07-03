@@ -1,6 +1,7 @@
 package classes;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -121,5 +122,48 @@ public class MongoDbAccess
 			}
 
 		return false;
+		}
+
+	public String afficherSoldes(String login)
+		{
+		String res = new String();
+		res += "libelle | solde\n";
+		
+		Logger.getLogger("").setLevel(Level.SEVERE);
+
+		try(MongoClient mongoClient= new MongoClient())
+			{
+			MongoDatabase db= mongoClient.getDatabase("bankonetdb");
+			MongoCollection<Document> collection= db.getCollection("clients");
+
+			BasicDBObject query= new BasicDBObject()
+				.append("login", login);
+
+			for(Document document: collection.find(query))
+				{
+				List comptesCourants = (ArrayList)document.get("comptesCourants");
+				for(Iterator iterator= comptesCourants.iterator() ; iterator
+						.hasNext() ;)
+					{
+					Document compteCourant= (Document)iterator.next();
+					res += compteCourant.get("libelle").toString()+" | "+compteCourant.get("solde").toString()+"\n";
+					}
+				
+				List comptesEpargnes = (ArrayList)document.get("comptesEpargnes");
+				for(Iterator iterator= comptesEpargnes.iterator() ; iterator
+						.hasNext() ;)
+					{
+					Document compteEpargne= (Document)iterator.next();
+					res += compteEpargne.get("libelle").toString()+" | "+compteEpargne.get("solde").toString()+"\n";
+					}
+				}
+
+			mongoClient.close();
+			}
+		finally
+			{
+			}
+		
+		return res;
 		}
 	}

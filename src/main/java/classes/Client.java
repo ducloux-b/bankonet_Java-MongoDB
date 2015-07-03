@@ -26,7 +26,7 @@ public class Client
 
 	public void ajouterCompteCourant(float solde)
 		{
-		this.compteCourantList.add(new CompteCourant(this.getNom(), this.getPrenom(), this.compteCourantList.size(), solde));
+		this.compteCourantList.add(new CompteCourant(this.getNom(), this.getPrenom(), this.compteCourantList.size()+1, solde));
 		}
 
 	public List<Compte> getCompteCourantList()

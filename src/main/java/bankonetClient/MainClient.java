@@ -38,6 +38,7 @@ public class MainClient
 		{
 		System.out.println("*****APPLICATION CONSEILLER BANCAIRE******");
 		System.out.println("0.Arrêter le programme");
+		System.out.println("1.Consulter les soldes des comptes");
 		System.out.println("Veuillez choisir une action.");
 		
 		Integer action = sysInInt();
@@ -46,12 +47,21 @@ public class MainClient
 			case 0:
 				terminerProgramme();
 				break;
+			case 1:
+				afficherSoldeDesComptes(login);
+				break;
 			default:
 				break;
 			}
 		
 		}
 	
+	private static void afficherSoldeDesComptes(String login)
+		{
+		System.out.println(dbAccess.afficherSoldes(login));
+		logged(login);
+		}
+
 	public static void terminerProgramme()
 		{
 		System.out.println(" Arrêt de l’application");
